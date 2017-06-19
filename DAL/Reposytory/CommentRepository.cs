@@ -30,7 +30,7 @@ namespace DAL
             context.SaveChanges();
         }
         public void Update(DalComment e)
-        {
+        {            
             var comments = context.Set<ORM.Comments>().Where(comm => comm.CommentId.Equals(e.Id)).FirstOrDefault();
             comments.commentText = e.Text;
             context.Entry(comments).State = EntityState.Modified;
@@ -41,6 +41,7 @@ namespace DAL
             var comments = context.Set<ORM.Comments>().Where(comm => comm.CommentId.Equals(id)).FirstOrDefault();
             context.Set<ORM.Comments>().Remove(comments);
             context.SaveChanges();
+            
         }
         public DalComment Get(int id)
         {

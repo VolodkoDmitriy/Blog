@@ -38,24 +38,22 @@ namespace Blog1.Controllers
         }
 
         [HttpPost]
-        public PartialViewResult Create(FormCollection collection)
+        public ActionResult Create(FormCollection collection)
         {
             try
             {
+                int postid = Convert.ToInt32(RouteData.Values["id"]);
                 if (User.Identity.IsAuthenticated)
-                {
-                    int postid = Convert.ToInt32(RouteData.Values["id"]);
+                {                   
                     int userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
-                    commentService.Create(new CommentEntity() { PostId = postid, UserId = userid, Text = collection["text"].ToString() });
-
-                    // TODO: Add insert logic here
+                    commentService.Create(new CommentEntity() { PostId = postid, UserId = userid, Text = collection["text"].ToString() });                    
                 }
-                return PartialView();
+                return RedirectToAction("Details", "Posts", new { id = postid });
 
             }
             catch
             {
-                return PartialView();
+                return RedirectToAction("Index", "Home");
             }
         }
         [HttpGet]

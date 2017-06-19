@@ -68,8 +68,9 @@ namespace DAL
         }
         public void Update(DalUser e)
         {
+            
             var users = context.Set<ORM.Users>().Where(user => user.UserId.Equals(e.Id)).Select(user => new DalUser()
-            {
+            {                
                 Name = user.Name,
                 Id = user.UserId,
                 RoleId = user.RoleId,
@@ -79,12 +80,14 @@ namespace DAL
             users.Email = e.Email;
             users.Password = e.Password;
             context.SaveChanges();
+            context.Dispose();
         }
         public void Delete(int id)
         {
             var users = context.Set<ORM.Users>().Where(user => user.UserId.Equals(id)).FirstOrDefault();
             context.Set<ORM.Users>().Remove(users);
             context.SaveChanges();
+            context.Dispose();
         }
 
     }

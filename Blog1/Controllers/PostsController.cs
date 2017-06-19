@@ -17,6 +17,7 @@ namespace Blog1.Controllers
         public PostsController(IService<PostEntity> service, IService<CommentEntity> commentService)
         {
             this.postService = service;
+            this.commentService = commentService;
         }
 
         // GET: Post
@@ -55,12 +56,19 @@ namespace Blog1.Controllers
         [HttpPost]
         public ActionResult Create(PostNewModel e)
         {
-            var post = new PostEntity()
+            try
             {
-                Text = e.Text
-            };
-            postService.Create(post);
-            return View();
+                var post = new PostEntity()
+                {
+                    Text = e.Text
+                };
+                postService.Create(post);
+                return RedirectToAction("Index", "Home");
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
         [HttpGet]
         public ActionResult Delete(int id)
@@ -69,7 +77,7 @@ namespace Blog1.Controllers
             if (User.Identity.Name.Equals("admin@mail.ru"))
             {
                 var comments = commentService.GetAll().Where(comm => comm.PostId == id);
-                foreach (var item in comments) commentService.Delete(item.Id);
+                foreach (var item in comments.ToList()) commentService.Delete(item.Id);
                 postService.Delete(id);
             }
             return RedirectToAction("Index", "Home");
