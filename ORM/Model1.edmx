@@ -1,0 +1,375 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="BlogDBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="BlogDBModelStoreContainer">
+    <EntitySet Name="Users" EntityType="BlogDBModel.Store.Users" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Roles" EntityType="BlogDBModel.Store.Roles" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Posts" EntityType="BlogDBModel.Store.Posts" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Tags" EntityType="BlogDBModel.Store.Tags" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="post_tag" EntityType="BlogDBModel.Store.post_tag" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Comments" EntityType="BlogDBModel.Store.Comments" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="Postpost_tag" Association="BlogDBModel.Store.Postpost_tag">
+      <End Role="Post" EntitySet="Posts" />
+      <End Role="post_tag" EntitySet="post_tag" />
+    </AssociationSet>
+    <AssociationSet Name="Tagpost_tag" Association="BlogDBModel.Store.Tagpost_tag">
+      <End Role="Tag" EntitySet="Tags" />
+      <End Role="post_tag" EntitySet="post_tag" />
+    </AssociationSet>
+    <AssociationSet Name="UserComment" Association="BlogDBModel.Store.UserComment">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Comment" EntitySet="Comments" />
+    </AssociationSet>
+    <AssociationSet Name="PostComment" Association="BlogDBModel.Store.PostComment">
+      <End Role="Post" EntitySet="Posts" />
+      <End Role="Comment" EntitySet="Comments" />
+    </AssociationSet>
+    <AssociationSet Name="RoleUser" Association="BlogDBModel.Store.RoleUser">
+      <End Role="Role" EntitySet="Roles" />
+      <End Role="User" EntitySet="Users" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Users">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RoleId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Roles">
+    <Key>
+      <PropertyRef Name="RoleId" />
+    </Key>
+    <Property Name="RoleId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Posts">
+    <Key>
+      <PropertyRef Name="PostId" />
+    </Key>
+    <Property Name="PostId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Tags">
+    <Key>
+      <PropertyRef Name="TagId" />
+    </Key>
+    <Property Name="TagId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TagName" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="post_tag">
+    <Key>
+      <PropertyRef Name="PostId" />
+      <PropertyRef Name="TagId" />
+    </Key>
+    <Property Name="PostId" Type="int" Nullable="false" />
+    <Property Name="TagId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Comments">
+    <Key>
+      <PropertyRef Name="CommentId" />
+    </Key>
+    <Property Name="CommentId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="commentText" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="UserId" Type="int" Nullable="false" />
+    <Property Name="PostId" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="Postpost_tag">
+    <End Role="Post" Type="BlogDBModel.Store.Posts" Multiplicity="1" />
+    <End Role="post_tag" Type="BlogDBModel.Store.post_tag" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Post">
+        <PropertyRef Name="PostId" />
+      </Principal>
+      <Dependent Role="post_tag">
+        <PropertyRef Name="PostId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="Tagpost_tag">
+    <End Role="Tag" Type="BlogDBModel.Store.Tags" Multiplicity="1" />
+    <End Role="post_tag" Type="BlogDBModel.Store.post_tag" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Tag">
+        <PropertyRef Name="TagId" />
+      </Principal>
+      <Dependent Role="post_tag">
+        <PropertyRef Name="TagId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserComment">
+    <End Role="User" Type="BlogDBModel.Store.Users" Multiplicity="1" />
+    <End Role="Comment" Type="BlogDBModel.Store.Comments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="Comment">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PostComment">
+    <End Role="Post" Type="BlogDBModel.Store.Posts" Multiplicity="1" />
+    <End Role="Comment" Type="BlogDBModel.Store.Comments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Post">
+        <PropertyRef Name="PostId" />
+      </Principal>
+      <Dependent Role="Comment">
+        <PropertyRef Name="PostId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="RoleUser">
+    <End Role="Role" Type="BlogDBModel.Store.Roles" Multiplicity="1" />
+    <End Role="User" Type="BlogDBModel.Store.Users" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Role">
+        <PropertyRef Name="RoleId" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="RoleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BlogDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="BlogDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Users" EntityType="BlogDBModel.User" />
+          <EntitySet Name="Roles" EntityType="BlogDBModel.Role" />
+          <EntitySet Name="Posts" EntityType="BlogDBModel.Post" />
+          <EntitySet Name="Tags" EntityType="BlogDBModel.Tag" />
+          <EntitySet Name="post_tag" EntityType="BlogDBModel.post_tag" />
+          <EntitySet Name="Comments" EntityType="BlogDBModel.Comment" />
+          <AssociationSet Name="Postpost_tag" Association="BlogDBModel.Postpost_tag">
+            <End Role="Post" EntitySet="Posts" />
+            <End Role="post_tag" EntitySet="post_tag" />
+          </AssociationSet>
+          <AssociationSet Name="Tagpost_tag" Association="BlogDBModel.Tagpost_tag">
+            <End Role="Tag" EntitySet="Tags" />
+            <End Role="post_tag" EntitySet="post_tag" />
+          </AssociationSet>
+          <AssociationSet Name="UserComment" Association="BlogDBModel.UserComment">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="PostComment" Association="BlogDBModel.PostComment">
+            <End Role="Post" EntitySet="Posts" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="RoleUser" Association="BlogDBModel.RoleUser">
+            <End Role="Role" EntitySet="Roles" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Password" Type="String" Nullable="false" />
+          <Property Name="Email" Type="String" Nullable="false" />
+          <Property Name="RoleId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Comments" Relationship="BlogDBModel.UserComment" FromRole="User" ToRole="Comment" />
+          <NavigationProperty Name="Role" Relationship="BlogDBModel.RoleUser" FromRole="User" ToRole="Role" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="RoleId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="BlogDBModel.RoleUser" FromRole="Role" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Post">
+          <Key>
+            <PropertyRef Name="PostId" />
+          </Key>
+          <Property Name="PostId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="String" Nullable="false" />
+          <NavigationProperty Name="post_tag" Relationship="BlogDBModel.Postpost_tag" FromRole="Post" ToRole="post_tag" />
+          <NavigationProperty Name="Comments" Relationship="BlogDBModel.PostComment" FromRole="Post" ToRole="Comment" />
+        </EntityType>
+        <EntityType Name="Tag">
+          <Key>
+            <PropertyRef Name="TagId" />
+          </Key>
+          <Property Name="TagId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TagName" Type="String" Nullable="false" />
+          <NavigationProperty Name="post_tag" Relationship="BlogDBModel.Tagpost_tag" FromRole="Tag" ToRole="post_tag" />
+        </EntityType>
+        <EntityType Name="post_tag" >
+          <Key>
+            <PropertyRef Name="PostId" />
+            <PropertyRef Name="TagId" />
+          </Key>
+          <Property Name="PostId" Nullable="false" Type="Int32" />
+          <Property Name="TagId" Nullable="false" Type="Int32" />
+          <NavigationProperty Name="Post" Relationship="BlogDBModel.Postpost_tag" FromRole="post_tag" ToRole="Post" />
+          <NavigationProperty Name="Tag" Relationship="BlogDBModel.Tagpost_tag" FromRole="post_tag" ToRole="Tag" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="CommentId" />
+          </Key>
+          <Property Name="CommentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="commentText" Type="String" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="BlogDBModel.UserComment" FromRole="Comment" ToRole="User" />
+          <Property Name="PostId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Post" Relationship="BlogDBModel.PostComment" FromRole="Comment" ToRole="Post" />
+        </EntityType>
+        <Association Name="Postpost_tag">
+          <End Type="BlogDBModel.Post" Role="Post" Multiplicity="1" />
+          <End Type="BlogDBModel.post_tag" Role="post_tag" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="PostId" />
+            </Principal>
+            <Dependent Role="post_tag">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Tagpost_tag">
+          <End Type="BlogDBModel.Tag" Role="Tag" Multiplicity="1" />
+          <End Type="BlogDBModel.post_tag" Role="post_tag" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tag">
+              <PropertyRef Name="TagId" />
+            </Principal>
+            <Dependent Role="post_tag">
+              <PropertyRef Name="TagId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="UserComment">
+          <End Type="BlogDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="BlogDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PostComment">
+          <End Type="BlogDBModel.Post" Role="Post" Multiplicity="1" />
+          <End Type="BlogDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="PostId" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="RoleUser">
+          <End Type="BlogDBModel.Role" Role="Role" Multiplicity="1" />
+          <End Type="BlogDBModel.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Role">
+              <PropertyRef Name="RoleId" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BlogDBModelStoreContainer" CdmEntityContainer="BlogDBEntities">
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.User)">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Roles">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.Role)">
+        <MappingFragment StoreEntitySet="Roles">
+          <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Posts">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.Post)">
+        <MappingFragment StoreEntitySet="Posts">
+          <ScalarProperty Name="PostId" ColumnName="PostId" />
+          <ScalarProperty Name="Text" ColumnName="Text" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Tags">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.Tag)">
+        <MappingFragment StoreEntitySet="Tags">
+          <ScalarProperty Name="TagId" ColumnName="TagId" />
+          <ScalarProperty Name="TagName" ColumnName="TagName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="post_tag">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.post_tag)">
+        <MappingFragment StoreEntitySet="post_tag">
+          <ScalarProperty Name="PostId" ColumnName="PostId" />
+          <ScalarProperty Name="TagId" ColumnName="TagId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Comments">
+      <EntityTypeMapping TypeName="IsTypeOf(BlogDBModel.Comment)">
+        <MappingFragment StoreEntitySet="Comments">
+          <ScalarProperty Name="CommentId" ColumnName="CommentId" />
+          <ScalarProperty Name="commentText" ColumnName="commentText" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="PostId" ColumnName="PostId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
