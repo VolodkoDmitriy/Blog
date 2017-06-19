@@ -52,14 +52,11 @@
     <Compile Include="DTO\CommentEntity.cs" />
     <Compile Include="DTO\PostEntity.cs" />
     <Compile Include="DTO\RoleEntity.cs" />
-    <Compile Include="DTO\TagEntity.cs" />
-    <Compile Include="Interface\Class1.cs" />
     <Compile Include="DTO\UserEntity.cs" />
     <Compile Include="Interface\IUserService.cs" />
     <Compile Include="Mappers\BllEntityMappers.cs" />
     <Compile Include="Services\PostService.cs" />
     <Compile Include="Services\CommentService.cs" />
-    <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

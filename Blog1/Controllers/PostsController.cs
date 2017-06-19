@@ -62,7 +62,33 @@ namespace Blog1.Controllers
             postService.Create(post);
             return View();
         }
-
+        [HttpGet]
+        public ActionResult Delete(int id)
+        {
+            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+            if (User.Identity.Name.Equals("admin@mail.ru"))
+            {
+                var comments = commentService.GetAll().Where(comm => comm.PostId == id);
+                foreach (var item in comments) commentService.Delete(item.Id);
+                postService.Delete(id);
+            }
+            return RedirectToAction("Index", "Home");
+        }
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            var postEntity = postService.Get(id);
+            var postModel = new Models.PostNewModel() { Id = postEntity.Id, Text =postEntity.Text };
+            return View(postModel);
+        }
+        [HttpPost]
+        public ActionResult Edit(Models.PostNewModel collection)
+        {
+            var post = postService.Get(collection.Id);
+            post.Text = collection.Text;
+            postService.Update(post);
+            return RedirectToAction("Index", "Home");
+        }
 
     }
 }

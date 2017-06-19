@@ -19,12 +19,15 @@ namespace Blog1.Controllers
             this.userService = service;
             this.commentService = commentService;
         }
-        
+
         public PartialViewResult List()
         {
             int postid = Convert.ToInt32(RouteData.Values["id"]);
-            var comments = commentService.GetAll().Where(comm => comm.PostId.Equals(postid)).Select(comm => new Blog1.Models.CommentViewModel() {
-                Id = comm.Id, Text = comm.Text , User = userService.Get(comm.UserId).Email
+            var comments = commentService.GetAll().Where(comm => comm.PostId.Equals(postid)).Select(comm => new Blog1.Models.CommentViewModel()
+            {
+                Id = comm.Id,
+                Text = comm.Text,
+                User = userService.Get(comm.UserId).Email
             });
             return PartialView(comments);
         }
@@ -39,25 +42,47 @@ namespace Blog1.Controllers
         {
             try
             {
-                int postid = Convert.ToInt32( RouteData.Values["id"]);
-                int userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
-                commentService.Create(new CommentEntity() { PostId = postid, UserId = userid, Text = collection["text"].ToString() });
+                if (User.Identity.IsAuthenticated)
+                {
+                    int postid = Convert.ToInt32(RouteData.Values["id"]);
+                    int userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
+                    commentService.Create(new CommentEntity() { PostId = postid, UserId = userid, Text = collection["text"].ToString() });
 
-                // TODO: Add insert logic here
-
+                    // TODO: Add insert logic here
+                }
                 return PartialView();
+
             }
             catch
             {
                 return PartialView();
             }
         }
-        
-
-        // GET: Comments/Delete/5
+        [HttpGet]
         public ActionResult Delete(int id)
         {
-            return View();
-        }    
+            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+            var comment = commentService.Get(id);
+            var userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
+            if (userid == comment.UserId)
+                commentService.Delete(id);
+            return RedirectToAction("Index", "Home");
+        }
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            var commEntity = commentService.Get(id);
+            var commModel = new Models.NewCommentModel() { Id= commEntity.Id, PostId = commEntity.PostId, UserId = commEntity.UserId, Text = commEntity.Text};
+            return View(commModel);
+        }
+        [HttpPost]
+        public ActionResult Edit(Models.NewCommentModel collection)
+        {
+            var comm = commentService.Get(collection.Id);
+            comm.Text = collection.Text;
+            commentService.Update(comm);
+            return RedirectToAction("Details", "Posts", new { id = comm.PostId });
+        }
+
     }
 }

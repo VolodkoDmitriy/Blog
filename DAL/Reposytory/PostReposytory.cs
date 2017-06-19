@@ -29,18 +29,16 @@ namespace DAL
         }
         public void Update(DalPost e)
         {
-            var posts = context.Set<ORM.Posts>().Where(post => post.PostId.Equals(e.Id)).Select(post => new DalPost()
-            {
-                Text = post.Text,
-                Id = post.PostId
-            }).FirstOrDefault();
+            var posts = context.Set<ORM.Posts>().Where(post => post.PostId.Equals(e.Id)).FirstOrDefault();
             posts.Text = e.Text;
+            context.Entry(posts).State = EntityState.Modified;
             context.SaveChanges();
         }
         public void Delete(int id)
         {
             var posts = context.Set<ORM.Posts>().Where(post => post.PostId.Equals(id)).FirstOrDefault();
-            context.Set<ORM.Posts>().Remove(posts);
+            context.Set<ORM.Posts>().Remove(posts);         
+
             context.SaveChanges();
         }
         public DalPost Get(int id)
