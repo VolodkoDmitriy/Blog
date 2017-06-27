@@ -18,6 +18,7 @@ namespace ORM
         public User()
         {
             this.Comments = new HashSet<Comment>();
+            this.Post = new HashSet<Post>();
         }
     
         public int UserId { get; set; }
@@ -29,5 +30,7 @@ namespace ORM
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual Role Role { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Post> Post { get; set; }
     }
 }

@@ -47,18 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DTO\DalComment.cs" />
-    <Compile Include="DTO\DalTag.cs" />
-    <Compile Include="DTO\DalPost.cs" />
-    <Compile Include="DTO\DalRole.cs" />
-    <Compile Include="DTO\DalUser.cs" />
-    <Compile Include="DTO\IEntity.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
-    <Compile Include="Interfaces\IUserRepository.cs" />
-    <Compile Include="Reposytory\CommentRepository.cs" />
-    <Compile Include="Reposytory\PostReposytory.cs" />
-    <Compile Include="Reposytory\RoleRepository.cs" />
-    <Compile Include="Reposytory\UserRepository.cs" />
+    <Compile Include="Reposytory\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

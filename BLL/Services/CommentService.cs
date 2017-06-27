@@ -1,48 +1,37 @@
-﻿using BLL.DTO;
-using BLL.Interface;
-using BLL.Mappers;
-using DAL;
-using DAL.DTO;
-using DAL.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using BLL.Interface;
+using ORM;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DAL.Interfaces;
+using System.Web;
 
 namespace BLL.Services
 {
-    public class CommentService : IService<CommentEntity>
+    public class CommentService : BLService<Comments>
     {
-        private readonly IRepository<DalComment> commentRepository;
-
-        public CommentService(IRepository<DalComment> repository)
+        private readonly IService<Users> userService;
+        public CommentService(IRepository<Comments> repository, IService<Users> userService) : base(repository)
         {
-            this.commentRepository = repository;
+            this.userService = userService;
+        }
+        public void Create(int postId, string text, string email)
+        {
+            var user = userService.Get(u => u.Email.Equals(email))
+                                    .FirstOrDefault();
+            var comment = new Comments()
+            {
+                commentText = HttpUtility.HtmlEncode(text),
+                UserId = user.UserId,
+                PostId = postId                
+            };
+            Create(comment);
         }
 
-        public void Create(CommentEntity e)
+        public int Edit(int id, string text)
         {
-            commentRepository.Create(e.ToDalComment());
-        }
-
-        public void Delete(int id)
-        {
-            commentRepository.Delete(id);
-        }
-
-        public CommentEntity Get(int id)
-        {
-            return commentRepository.Get(id).ToBllComment();
-        }
-        public IEnumerable<CommentEntity> GetAll()
-        {
-            return commentRepository.GetAll().Select(comm => comm.ToBllComment());
-        }
-
-        public void Update(CommentEntity e)
-        {
-            commentRepository.Update(e.ToDalComment());
+            var comment = Get(id);
+            comment.commentText = HttpUtility.HtmlEncode(text);
+            Update(comment);
+            return comment.PostId;
         }
     }
 }

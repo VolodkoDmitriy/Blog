@@ -12,21 +12,37 @@
         <dt>
             @Html.DisplayNameFor(model => model.Text)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Text)
         </dd>
 
+        <dt>
+            <b>Autor</b>
+        </dt>        
+        <dd>
+            @Html.ActionLink(Model.UserName, "Autor", "Posts", new { id = Model.UserName }, null)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+        
 
         <dt>
             @Html.DisplayNameFor(model => model.Comments)
         </dt>
-
         <dd>
             @{Html.RenderAction("List", "Comments");}
         </dd>
-        <dd>
-        @{Html.RenderAction("Create", "Comments");}
-        </dd>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <dd>
+                @{Html.RenderAction("Create", "Comments");}
+            </dd>
+        }
     </dl>
 </div>

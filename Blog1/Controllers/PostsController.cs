@@ -1,8 +1,8 @@
-﻿using BLL.DTO;
-using BLL.Interface;
+﻿using BLL.Interface;
+using BLL.Services;
 using Blog1.Models;
+using ORM;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,91 +11,158 @@ namespace Blog1.Controllers
 {
     public class PostsController : Controller
     {
-        private readonly IService<PostEntity> postService;
-        private readonly IService<CommentEntity> commentService;
+        private readonly PostService postService;
+        private readonly IService<Users> userService;
+        private readonly SearchService searchService;
 
-        public PostsController(IService<PostEntity> service, IService<CommentEntity> commentService)
+        public PostsController(PostService service,  IService<Users> userService)
         {
             this.postService = service;
-            this.commentService = commentService;
+            this.userService = userService;
+            this.searchService = new SearchService(postService);
+        }       
+
+        [HttpGet]
+        public ActionResult Index(int count = 10, int page = 1)
+        {        
+            return List(count , page);
+        }
+        
+        [HttpGet]        
+        public ViewResult List(int count=10, int page=1)
+        {
+            var posts = postService.Get(orderBy: post => post.OrderBy(q => q.CreateDate));            
+
+            var pageinfo = new PageInfo(page,count, posts.Count());
+
+            var modelPosts =  posts
+                                    .Skip(count * (page - 1))
+                                    .Take(count)
+                                    .Select(post => new PostViewModel()
+                                    {
+                                        Text = HttpUtility.HtmlDecode(post.Text),
+                                        Id = post.PostId,
+                                        UserName = userService.Get(post.UserId).Email
+                                    });
+
+            var results = new PagedList<PostViewModel>(modelPosts, pageinfo);
+            results.url = x => Url.Action("Index", new { page = x });
+            ViewBag.Title = "Index";
+            ViewBag.Header = "Last posts";
+
+            return View("list",results);
         }
 
-        // GET: Post
-        public ActionResult Index()
-        {        
-            return View();
-        }
         [HttpGet]
-        public PartialViewResult list(int count=10,int slide=0)
+        public ViewResult Autor(string id,int count = 10, int page = 1)
         {
-            return PartialView(postService.GetAll().Select(post => new PostViewModel()
+            var user = userService.Get(_user => _user.Name.Equals(id)).FirstOrDefault();           
+
+            if (user != null)
             {
-                Text = post.Text,
-                Id = post.Id
-               // Comments = commentService.GetAll().Where(comm => comm.PostId == user.Id).ToString()
-            
+                ViewBag.Title = user.Name;
+                ViewBag.Header = user.Name +" last posts";
+
+                var allPosts = postService.Get(post => post.UserId.Equals(user.UserId));
+
+                var pageinfo = new PageInfo(page, count, allPosts.Count());
+
+                var pagePosts = allPosts.Skip((page-1) * count)
+                                 .Take(count)
+                                 .OrderBy(post => post.CreateDate)
+                        .Select(post => new PostViewModel()
+                        {   Text = HttpUtility.HtmlDecode(post.Text),
+                            Id = post.PostId,
+                            UserName = userService.Get(post.UserId).Email
+                        });
+                
+                var results = new PagedList<PostViewModel>(pagePosts, pageinfo);
+                results.url = x => Url.Action("Autor", new {id=id, page = x });
+                return View("list", results);
             }
-                ));
+            return View("NotFoundAutor");
         }
+
         [HttpGet]
+        public ActionResult Search(string SearchString, int count = 10, int page = 1)
+        {
+            var searchResults = searchService.Search(SearchString);
+
+            if (searchResults.Count() > 0)
+            {
+                var pageinfo = new PageInfo(page, count, searchResults.Count());
+
+                var posts = searchResults
+                    .Skip((page - 1) * count)
+                    .Take(count)
+                    .Select(post => new PostViewModel()
+                    {
+                        Text = HttpUtility.HtmlDecode(post.Text),
+                        Id = post.PostId,
+                        UserName = userService.Get(post.UserId).Email
+                    });
+
+                var results = new PagedList<PostViewModel>(posts, pageinfo);
+
+                results.url = x => Url.Action("Search", new { SearchString = SearchString, page = x });
+                ViewBag.Title = "Search Results";
+                ViewBag.Header = "Search Results";
+                return View("list", results);
+            }
+            else return View("SearchNotFound");
+        }
+
+        [HttpGet]
+        [HandleError(ExceptionType = typeof(NullReferenceException),View = "PostNotFound")]
         public ActionResult Details(int id)
         {
             var postentity = postService.Get(id);
+            var username = userService.Get(postentity.UserId).Name;
             var post = new PostViewModel()
             {
-                Text = postentity.Text,
-                Id = postentity.Id
+                Text = HttpUtility.HtmlDecode(postentity.Text),
+                Id = postentity.PostId,
+                UserId = postentity.UserId,
+                UserName = username,
+                CreateDate = postentity.CreateDate
             };            
             return View(post);
         }
         [HttpGet]
-        public PartialViewResult Create()
+        public ViewResult Create()
         {
-            return PartialView();
+            return View();
         }
         [HttpPost]
+        [Authorize(Roles = "user")]
         public ActionResult Create(PostNewModel e)
         {
-            try
-            {
-                var post = new PostEntity()
-                {
-                    Text = e.Text
-                };
-                postService.Create(post);
-                return RedirectToAction("Index", "Home");
-            }
-            catch
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            var autor = postService.Create(e.Text, User.Identity.Name);
+
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
         [HttpGet]
+        [PostAutor]
         public ActionResult Delete(int id)
         {
-            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
-            if (User.Identity.Name.Equals("admin@mail.ru"))
-            {
-                var comments = commentService.GetAll().Where(comm => comm.PostId == id);
-                foreach (var item in comments.ToList()) commentService.Delete(item.Id);
-                postService.Delete(id);
-            }
-            return RedirectToAction("Index", "Home");
+            var autor = userService.Get(postService.Get(id).UserId).Name;
+            postService.Remove(id);
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
         [HttpGet]
+        [PostAutor]
         public ActionResult Edit(int id)
         {
             var postEntity = postService.Get(id);
-            var postModel = new Models.PostNewModel() { Id = postEntity.Id, Text =postEntity.Text };
+            var postModel = new PostNewModel() { Id = postEntity.PostId, Text = HttpUtility.HtmlDecode(postEntity.Text) };
             return View(postModel);
         }
         [HttpPost]
+        [PostAutor]
         public ActionResult Edit(Models.PostNewModel collection)
         {
-            var post = postService.Get(collection.Id);
-            post.Text = collection.Text;
-            postService.Update(post);
-            return RedirectToAction("Index", "Home");
+            postService.Edit(collection.Id,collection.Text);
+            return RedirectToAction("Details", "Posts", new { id = collection.Id });
         }
 
     }

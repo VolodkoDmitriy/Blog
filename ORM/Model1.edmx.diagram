@@ -7,15 +7,16 @@
       <Diagram DiagramId="0410e6d4b38944ab8b5aaaa0f6a3e5a0" Name="Diagram1" ZoomLevel="100">
         <EntityTypeShape EntityType="BlogDBModel.User" Width="1.5" PointX="4.625" PointY="1.5" />
         <EntityTypeShape EntityType="BlogDBModel.Role" Width="1.75" PointX="1.25" PointY="1.625" />
-        <EntityTypeShape EntityType="BlogDBModel.Post" Width="1.5" PointX="8.375" PointY="4.875" />
-        <EntityTypeShape EntityType="BlogDBModel.Tag" Width="1.5" PointX="1.25" PointY="5" />
-        <EntityTypeShape EntityType="BlogDBModel.post_tag" Width="1.5" PointX="4.375" PointY="4.75" />
-        <EntityTypeShape EntityType="BlogDBModel.Comment" Width="1.5" PointX="8.25" PointY="1.75" />
+        <EntityTypeShape EntityType="BlogDBModel.Post" Width="1.5" PointX="8.625" PointY="3.75" />
+        <EntityTypeShape EntityType="BlogDBModel.Tag" PointX="0.75" PointY="4.75" Width="1.5" />
+        <EntityTypeShape EntityType="BlogDBModel.post_tag" PointX="4.625" PointY="4.5" Width="1.5" />
+        <EntityTypeShape EntityType="BlogDBModel.Comment" Width="1.5" PointX="8.5" PointY="0.75" />
         <AssociationConnector Association="BlogDBModel.Postpost_tag" />
         <AssociationConnector Association="BlogDBModel.Tagpost_tag" />
         <AssociationConnector Association="BlogDBModel.UserComment" />
         <AssociationConnector Association="BlogDBModel.PostComment" />
         <AssociationConnector Association="BlogDBModel.RoleUser" />
+        <AssociationConnector Association="BlogDBModel.UserPost" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

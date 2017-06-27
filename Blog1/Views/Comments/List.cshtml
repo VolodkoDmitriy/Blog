@@ -1,15 +1,6 @@
 ﻿@model IEnumerable<Blog1.Models.CommentViewModel>
 
 <table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.User)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Text)
-        </th>
-        <th></th>
-    </tr>
 
 @foreach (var item in Model) {
     <tr>
@@ -20,8 +11,13 @@
             @Html.DisplayFor(modelItem => item.Text)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete",  new { id=item.Id })
+            @if (User.Identity.Name == item.User)
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) 
+                <span> | </span>
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            }
+            
         </td>
     </tr>
 }

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/18/2017 17:05:18
+-- Date Created: 06/23/2017 17:48:14
 -- Generated from EDMX file: D:\epam\Blog1\ORM\Model1.edmx
 -- --------------------------------------------------
 
@@ -17,11 +17,44 @@ GO
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_Postpost_tag]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[post_tag] DROP CONSTRAINT [FK_Postpost_tag];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Tagpost_tag]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[post_tag] DROP CONSTRAINT [FK_Tagpost_tag];
+GO
+IF OBJECT_ID(N'[dbo].[FK_UserComment]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Comments] DROP CONSTRAINT [FK_UserComment];
+GO
+IF OBJECT_ID(N'[dbo].[FK_PostComment]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Comments] DROP CONSTRAINT [FK_PostComment];
+GO
+IF OBJECT_ID(N'[dbo].[FK_RoleUser]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Users] DROP CONSTRAINT [FK_RoleUser];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[Users]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Users];
+GO
+IF OBJECT_ID(N'[dbo].[Roles]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Roles];
+GO
+IF OBJECT_ID(N'[dbo].[Posts]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Posts];
+GO
+IF OBJECT_ID(N'[dbo].[Tags]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Tags];
+GO
+IF OBJECT_ID(N'[dbo].[post_tag]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[post_tag];
+GO
+IF OBJECT_ID(N'[dbo].[Comments]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Comments];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -47,7 +80,8 @@ GO
 -- Creating table 'Posts'
 CREATE TABLE [dbo].[Posts] (
     [PostId] int IDENTITY(1,1) NOT NULL,
-    [Text] nvarchar(max)  NOT NULL
+    [Text] nvarchar(max)  NOT NULL,
+    [UserId] int  NOT NULL
 );
 GO
 
@@ -185,6 +219,21 @@ GO
 CREATE INDEX [IX_FK_RoleUser]
 ON [dbo].[Users]
     ([RoleId]);
+GO
+
+-- Creating foreign key on [UserId] in table 'Posts'
+ALTER TABLE [dbo].[Posts]
+ADD CONSTRAINT [FK_UserPost]
+    FOREIGN KEY ([UserId])
+    REFERENCES [dbo].[Users]
+        ([UserId])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_UserPost'
+CREATE INDEX [IX_FK_UserPost]
+ON [dbo].[Posts]
+    ([UserId]);
 GO
 
 -- --------------------------------------------------

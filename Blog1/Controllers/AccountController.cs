@@ -1,14 +1,11 @@
-﻿using BLL;
-using BLL.Interface;
+﻿using BLL.Interface;
 using Blog1.Infrastructure;
-using Blog1.Infrastructure.Mappers;
 using Blog1.Models;
+using ORM;
 using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -16,9 +13,9 @@ namespace Blog1.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IService<UserEntity> service;
+        private readonly IService<Users> service;
 
-        public AccountController(IService<UserEntity> service)
+        public AccountController(IService<Users> service)
         {
             this.service = service;
         }
@@ -29,9 +26,10 @@ namespace Blog1.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "administrator")]
+        //[HandleError(HttpNotFound)]
         public ActionResult Users()
         {
-            return View(service.GetAll().Select(user => user.ToMvcUser()));
+            return View(service.Get());
         }
         [HttpGet]
         [AllowAnonymous]
@@ -54,7 +52,7 @@ namespace Blog1.Controllers
                     FormsAuthentication.SetAuthCookie(user.Email, true);
                     //Управляет службами проверки подлинности с помощью форм для веб-приложений
                     
-                     return RedirectToAction("Index", "Home");
+                     return RedirectToAction("Index", "Posts");
                     
                 }
                 else
@@ -88,7 +86,7 @@ namespace Blog1.Controllers
                 return View(viewModel);
             }
 
-            var anyUser = service.GetAll().Any(u => u.Email.Contains(viewModel.Email));
+            var anyUser = service.Get(u => u.Email.Contains(viewModel.Email)).Any();
 
             if (anyUser)
             {
@@ -104,7 +102,7 @@ namespace Blog1.Controllers
                 if (membershipUser != null)
                 {
                     FormsAuthentication.SetAuthCookie(viewModel.Email, false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Posts");
                 }
                 else
                 {
@@ -131,7 +129,7 @@ namespace Blog1.Controllers
             ci.Dispose();
             return null;
         }
-        public PartialViewResult log()
+        public PartialViewResult Log()
         {
             if(User.Identity.IsAuthenticated)
             ViewBag.userName = User.Identity.Name;

@@ -9,16 +9,16 @@
     <EntitySet Name="Users" EntityType="BlogDBModel.Store.Users" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Roles" EntityType="BlogDBModel.Store.Roles" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Posts" EntityType="BlogDBModel.Store.Posts" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Tags" EntityType="BlogDBModel.Store.Tags" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="post_tag" EntityType="BlogDBModel.Store.post_tag" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Tags" EntityType="BlogDBModel.Store.Tags" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="post_tag" EntityType="BlogDBModel.Store.post_tag" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Comments" EntityType="BlogDBModel.Store.Comments" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="Postpost_tag" Association="BlogDBModel.Store.Postpost_tag">
-      <End Role="Post" EntitySet="Posts" />
-      <End Role="post_tag" EntitySet="post_tag" />
+      <End EntitySet="Posts" Role="Post" />
+      <End EntitySet="post_tag" Role="post_tag" />
     </AssociationSet>
     <AssociationSet Name="Tagpost_tag" Association="BlogDBModel.Store.Tagpost_tag">
-      <End Role="Tag" EntitySet="Tags" />
-      <End Role="post_tag" EntitySet="post_tag" />
+      <End EntitySet="Tags" Role="Tag" />
+      <End EntitySet="post_tag" Role="post_tag" />
     </AssociationSet>
     <AssociationSet Name="UserComment" Association="BlogDBModel.Store.UserComment">
       <End Role="User" EntitySet="Users" />
@@ -31,6 +31,10 @@
     <AssociationSet Name="RoleUser" Association="BlogDBModel.Store.RoleUser">
       <End Role="Role" EntitySet="Roles" />
       <End Role="User" EntitySet="Users" />
+    </AssociationSet>
+    <AssociationSet Name="UserPost" Association="BlogDBModel.Store.UserPost">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Post" EntitySet="Posts" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Users">
@@ -56,21 +60,22 @@
     </Key>
     <Property Name="PostId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="UserId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Tags">
     <Key>
       <PropertyRef Name="TagId" />
     </Key>
-    <Property Name="TagId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="TagName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TagId" Nullable="false" StoreGeneratedPattern="Identity" Type="int" />
+    <Property Name="TagName" Nullable="false" Type="nvarchar(max)" />
   </EntityType>
   <EntityType Name="post_tag">
     <Key>
       <PropertyRef Name="PostId" />
       <PropertyRef Name="TagId" />
     </Key>
-    <Property Name="PostId" Type="int" Nullable="false" />
-    <Property Name="TagId" Type="int" Nullable="false" />
+    <Property Name="PostId" Nullable="false" Type="int" />
+    <Property Name="TagId" Nullable="false" Type="int" />
   </EntityType>
   <EntityType Name="Comments">
     <Key>
@@ -82,8 +87,8 @@
     <Property Name="PostId" Type="int" Nullable="false" />
   </EntityType>
   <Association Name="Postpost_tag">
-    <End Role="Post" Type="BlogDBModel.Store.Posts" Multiplicity="1" />
-    <End Role="post_tag" Type="BlogDBModel.Store.post_tag" Multiplicity="*" />
+    <End Type="BlogDBModel.Store.Posts" Multiplicity="1" Role="Post" />
+    <End Type="BlogDBModel.Store.post_tag" Multiplicity="*" Role="post_tag" />
     <ReferentialConstraint>
       <Principal Role="Post">
         <PropertyRef Name="PostId" />
@@ -94,8 +99,8 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="Tagpost_tag">
-    <End Role="Tag" Type="BlogDBModel.Store.Tags" Multiplicity="1" />
-    <End Role="post_tag" Type="BlogDBModel.Store.post_tag" Multiplicity="*" />
+    <End Type="BlogDBModel.Store.Tags" Multiplicity="1" Role="Tag" />
+    <End Type="BlogDBModel.Store.post_tag" Multiplicity="*" Role="post_tag" />
     <ReferentialConstraint>
       <Principal Role="Tag">
         <PropertyRef Name="TagId" />
@@ -141,6 +146,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="UserPost">
+    <End Role="User" Type="BlogDBModel.Store.Users" Multiplicity="1" />
+    <End Role="Post" Type="BlogDBModel.Store.Posts" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="Post">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -153,12 +170,12 @@
           <EntitySet Name="post_tag" EntityType="BlogDBModel.post_tag" />
           <EntitySet Name="Comments" EntityType="BlogDBModel.Comment" />
           <AssociationSet Name="Postpost_tag" Association="BlogDBModel.Postpost_tag">
-            <End Role="Post" EntitySet="Posts" />
-            <End Role="post_tag" EntitySet="post_tag" />
+            <End EntitySet="Posts" Role="Post" />
+            <End EntitySet="post_tag" Role="post_tag" />
           </AssociationSet>
           <AssociationSet Name="Tagpost_tag" Association="BlogDBModel.Tagpost_tag">
-            <End Role="Tag" EntitySet="Tags" />
-            <End Role="post_tag" EntitySet="post_tag" />
+            <End EntitySet="Tags" Role="Tag" />
+            <End EntitySet="post_tag" Role="post_tag" />
           </AssociationSet>
           <AssociationSet Name="UserComment" Association="BlogDBModel.UserComment">
             <End Role="User" EntitySet="Users" />
@@ -172,6 +189,10 @@
             <End Role="Role" EntitySet="Roles" />
             <End Role="User" EntitySet="Users" />
           </AssociationSet>
+          <AssociationSet Name="UserPost" Association="BlogDBModel.UserPost">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Post" EntitySet="Posts" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -184,6 +205,7 @@
           <Property Name="RoleId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Comments" Relationship="BlogDBModel.UserComment" FromRole="User" ToRole="Comment" />
           <NavigationProperty Name="Role" Relationship="BlogDBModel.RoleUser" FromRole="User" ToRole="Role" />
+          <NavigationProperty Name="Post" Relationship="BlogDBModel.UserPost" FromRole="User" ToRole="Post" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -201,16 +223,18 @@
           <Property Name="Text" Type="String" Nullable="false" />
           <NavigationProperty Name="post_tag" Relationship="BlogDBModel.Postpost_tag" FromRole="Post" ToRole="post_tag" />
           <NavigationProperty Name="Comments" Relationship="BlogDBModel.PostComment" FromRole="Post" ToRole="Comment" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="BlogDBModel.UserPost" FromRole="Post" ToRole="User" />
         </EntityType>
         <EntityType Name="Tag">
           <Key>
             <PropertyRef Name="TagId" />
           </Key>
-          <Property Name="TagId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TagName" Type="String" Nullable="false" />
+          <Property Name="TagId" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
+          <Property Name="TagName" Nullable="false" Type="String" />
           <NavigationProperty Name="post_tag" Relationship="BlogDBModel.Tagpost_tag" FromRole="Tag" ToRole="post_tag" />
         </EntityType>
-        <EntityType Name="post_tag" >
+        <EntityType Name="post_tag">
           <Key>
             <PropertyRef Name="PostId" />
             <PropertyRef Name="TagId" />
@@ -232,8 +256,8 @@
           <NavigationProperty Name="Post" Relationship="BlogDBModel.PostComment" FromRole="Comment" ToRole="Post" />
         </EntityType>
         <Association Name="Postpost_tag">
-          <End Type="BlogDBModel.Post" Role="Post" Multiplicity="1" />
-          <End Type="BlogDBModel.post_tag" Role="post_tag" Multiplicity="*" />
+          <End Type="BlogDBModel.Post" Multiplicity="1" Role="Post" />
+          <End Type="BlogDBModel.post_tag" Multiplicity="*" Role="post_tag" />
           <ReferentialConstraint>
             <Principal Role="Post">
               <PropertyRef Name="PostId" />
@@ -244,8 +268,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="Tagpost_tag">
-          <End Type="BlogDBModel.Tag" Role="Tag" Multiplicity="1" />
-          <End Type="BlogDBModel.post_tag" Role="post_tag" Multiplicity="*" />
+          <End Type="BlogDBModel.Tag" Multiplicity="1" Role="Tag" />
+          <End Type="BlogDBModel.post_tag" Multiplicity="*" Role="post_tag" />
           <ReferentialConstraint>
             <Principal Role="Tag">
               <PropertyRef Name="TagId" />
@@ -291,6 +315,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="UserPost">
+          <End Type="BlogDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="BlogDBModel.Post" Role="Post" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Post">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -321,6 +357,7 @@
         <MappingFragment StoreEntitySet="Posts">
           <ScalarProperty Name="PostId" ColumnName="PostId" />
           <ScalarProperty Name="Text" ColumnName="Text" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

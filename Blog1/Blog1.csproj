@@ -138,6 +138,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Compile Include="App_Code\Myhelpers.cs" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -148,19 +149,22 @@
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\Account\Users.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Filters\CustomActionFilter.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\NinjectWeb.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PostsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -168,12 +172,12 @@
     <Compile Include="Infrastructure\CaptchaImage.cs" />
     <Compile Include="Infrastructure\CustomRoleProvider.cs" />
     <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
-    <Compile Include="Infrastructure\Mappers\MvcMappers.cs" />
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
+    <Compile Include="Models\PagedList.cs" />
     <Compile Include="Models\NewCommentModel.cs" />
     <Compile Include="Models\PostNewModel.cs" />
-    <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\PostViewModel.cs" />
+    <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\LogOnViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
@@ -184,13 +188,10 @@
     <Content Include="packages.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\_login.cshtml" />
-    <Content Include="Views\Shared\log.cshtml" />
-    <Content Include="Views\Posts\main.cshtml" />
     <Content Include="Views\Posts\Create.cshtml" />
     <Content Include="Views\Comments\Create.cshtml" />
     <Content Include="Views\Posts\list.cshtml" />
@@ -198,8 +199,14 @@
     <Content Include="Views\Comments\List.cshtml" />
     <Content Include="Views\Comments\Edit.cshtml" />
     <Content Include="Views\Posts\Edit.cshtml" />
-    <Content Include="Views\_404.cshtml" />
+    <Content Include="Views\Error\_404.cshtml" />
     <Content Include="Views\Error\Index.cshtml" />
+    <Content Include="Views\Error\NoPermition.cshtml" />
+    <Content Include="Views\Error\NotFoundAutor.cshtml" />
+    <Content Include="Views\Shared\NoPermition.cshtml" />
+    <Content Include="Views\Shared\NotFoundAutor.cshtml" />
+    <Content Include="Views\Posts\SearchNotFound.cshtml" />
+    <Content Include="Views\Posts\PostNotFound.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -208,7 +215,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Post\" />
+    <Folder Include="Infrastructure\Mappers\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BLL\BLL.csproj">

@@ -12,7 +12,7 @@ namespace Blog1.Models
         [ScaffoldColumn(false)]
         public int PostId { get; set; }
 
-        [Display(Name = "Post text")]
+        [Display(Name = "comment")]
         [DataType(DataType.MultilineText)]
         [Required(ErrorMessage = "The field can not be empty!")]
         public string Text { get; set; }

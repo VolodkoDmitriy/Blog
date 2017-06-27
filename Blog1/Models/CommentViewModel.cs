@@ -15,7 +15,7 @@ namespace Blog1.Models
         public string User { get; set; }
 
         [DataType(DataType.MultilineText)]
-        [Display(Name = "text")]
+        [Display(Name = "comments")]
         public string Text { get; set; }
     }
 }

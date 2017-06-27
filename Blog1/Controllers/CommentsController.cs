@@ -1,8 +1,6 @@
-﻿using BLL;
-using BLL.DTO;
-using BLL.Interface;
-using System;
-using System.Collections.Generic;
+﻿using BLL.Interface;
+using BLL.Services;
+using ORM;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,75 +9,73 @@ namespace Blog1.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly IService<UserEntity> userService;
-        private readonly IService<CommentEntity> commentService;
+        private readonly IService<Users> userService;
+        private readonly CommentService commentService;
 
-        public CommentsController(IService<UserEntity> service, IService<CommentEntity> commentService)
+        public CommentsController(IService<Users> service, CommentService commentService)
         {
             this.userService = service;
             this.commentService = commentService;
         }
 
-        public PartialViewResult List()
+        public PartialViewResult List(int id)
         {
-            int postid = Convert.ToInt32(RouteData.Values["id"]);
-            var comments = commentService.GetAll().Where(comm => comm.PostId.Equals(postid)).Select(comm => new Blog1.Models.CommentViewModel()
-            {
-                Id = comm.Id,
-                Text = comm.Text,
-                User = userService.Get(comm.UserId).Email
-            });
+            int postid = id;
+
+            var comments = commentService
+                        .Get(filter: comm => comm.PostId.Equals(postid))
+                        .Select(comm => new Blog1.Models.CommentViewModel()
+                        {
+                            Id = comm.CommentId,
+                            Text = HttpUtility.HtmlDecode(comm.commentText),
+                            User = userService.Get(comm.UserId).Email
+                        });
+
             return PartialView(comments);
         }
 
+        [HttpGet]
         public PartialViewResult Create()
         {
             return PartialView();
         }
 
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        [Authorize]
+        public ActionResult Create(int id,FormCollection collection)
         {
-            try
-            {
-                int postid = Convert.ToInt32(RouteData.Values["id"]);
-                if (User.Identity.IsAuthenticated)
-                {                   
-                    int userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
-                    commentService.Create(new CommentEntity() { PostId = postid, UserId = userid, Text = collection["text"].ToString() });                    
-                }
-                return RedirectToAction("Details", "Posts", new { id = postid });
+            commentService.Create(id, collection["text"], User.Identity.Name);
+            return RedirectToAction("Details", "Posts", new { id = id });
+        }
 
-            }
-            catch
-            {
-                return RedirectToAction("Index", "Home");
-            }
-        }
         [HttpGet]
+        [CommentAutor]
         public ActionResult Delete(int id)
-        {
-            if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+        {            
             var comment = commentService.Get(id);
-            var userid = userService.GetAll().Where(user => user.Email.Equals(User.Identity.Name)).FirstOrDefault().Id;
-            if (userid == comment.UserId)
                 commentService.Delete(id);
-            return RedirectToAction("Index", "Home");
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
+
         [HttpGet]
+        [CommentAutor]
         public ActionResult Edit(int id)
         {
             var commEntity = commentService.Get(id);
-            var commModel = new Models.NewCommentModel() { Id= commEntity.Id, PostId = commEntity.PostId, UserId = commEntity.UserId, Text = commEntity.Text};
+            var commModel = new Models.NewCommentModel()
+                    {   Id= commEntity.CommentId,
+                        PostId = commEntity.PostId,
+                        UserId = commEntity.UserId,
+                        Text = HttpUtility.HtmlDecode(commEntity.commentText)
+                    };
             return View(commModel);
         }
         [HttpPost]
-        public ActionResult Edit(Models.NewCommentModel collection)
+        [CommentAutor]
+        public ActionResult Edit(int id, Models.NewCommentModel collection)
         {
-            var comm = commentService.Get(collection.Id);
-            comm.Text = collection.Text;
-            commentService.Update(comm);
-            return RedirectToAction("Details", "Posts", new { id = comm.PostId });
+            var postId = commentService.Edit(id, collection.Text);
+            return RedirectToAction("Details", "Posts", new { id = postId });
         }
 
     }

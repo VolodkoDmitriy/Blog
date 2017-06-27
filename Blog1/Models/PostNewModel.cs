@@ -8,7 +8,7 @@ namespace Blog1.Models
         [ScaffoldColumn(false)]
         public int Id { get; set; }
 
-        [Display(Name = "Post text")]
+        [Display(Name = "Post")]
         [DataType(DataType.MultilineText)]
         [Required(ErrorMessage = "The field can not be empty!")]                
         public string Text { get; set; }

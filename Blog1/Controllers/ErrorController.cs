@@ -13,5 +13,13 @@ namespace Blog1.Controllers
         {
             return View();
         }
+        public ActionResult NoPermition()
+        {
+            return View();
+        }
+        public ActionResult NotFoundAutor()
+        {
+            return View();
+        }
     }
 }

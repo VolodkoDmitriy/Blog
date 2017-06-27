@@ -1,45 +1,49 @@
-﻿using BLL.DTO;
-using BLL.Interface;
-using BLL.Mappers;
-using DAL;
-using DAL.DTO;
-using DAL.Interfaces;
+﻿using BLL.Interface;
+using ORM;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DAL.Interfaces;
+using System.Web;
 
 namespace BLL.Services
 {
-    public class PostService : IService<PostEntity>
+    public class PostService: BLService<Posts>
     {
-        private readonly IRepository<DalPost> PostRepository;
-
-        public PostService(IRepository<DalPost> repository)
+        private readonly IService<Comments> commentsService;
+        private readonly IService<Users> userService;
+        public PostService(IRepository<Posts> repository,IService<Comments> commentsService, IService<Users> userService) : base(repository)
         {
-            this.PostRepository = repository;
+            this.commentsService = commentsService;
+            this.userService = userService;
+        }
+        public string Create(string text,string email)
+        {
+            var user = userService.Get(u => u.Email.Equals(email))
+                                    .FirstOrDefault();
+            var post = new Posts()
+            {
+                Text = HttpUtility.HtmlEncode(text),
+                UserId = user.UserId,
+                CreateDate = DateTime.Now
+            };
+            Create(post);
+            return user.Name;
         }
 
-        public void Create(PostEntity e)
+        public void Edit(int id, string text)
         {
-            PostRepository.Create(e.ToDalPost());
+            var post =Get(id);
+            post.Text = HttpUtility.HtmlEncode(text);
+            Update(post);
         }
-        public PostEntity Get(int id)
+        public void Remove(int id)
         {
-            return PostRepository.Get(id).ToBllPost();
-        }
-        public IEnumerable<PostEntity> GetAll()
-        {
-            return PostRepository.GetAll().Select(post => post.ToBllPost());
-        }
-        public void Update(PostEntity e)
-        {
-            PostRepository.Update(e.ToDalPost());
-        }
-        public void Delete(int id)
-        {
-            PostRepository.Delete(id);
+            var post = GetWithInclude(p => p.PostId == id, c => c.Comments).FirstOrDefault();
+            foreach (var item in post.Comments.ToList())
+            {
+                commentsService.Delete(item.CommentId);
+            }
+            Delete(id);
         }
     }
 }

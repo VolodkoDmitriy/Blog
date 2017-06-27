@@ -1,24 +1,26 @@
-﻿@model IEnumerable<Blog1.Models.PostViewModel>
+﻿@model Blog1.Models.PagedList<Blog1.Models.PostViewModel>
+<h4>@ViewBag.Header</h4>
+<table class="table">  
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Text)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
+@foreach (var item in Model.items) {    
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.Text)
+            @Html.ActionLink(item.Text, "Details", new { id = item.Id })
+            
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @if (item.UserName.Equals(User.Identity.Name))
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id });
+                <span> | </span>
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id });
+            }
         </td>
     </tr>
 }
-
 </table>
+<br />
+<div class="btn-group">    
+
+    @Html.PageLinks(Model.pageInfo, Model.url)
+</div>

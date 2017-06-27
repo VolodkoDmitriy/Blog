@@ -1,11 +1,7 @@
-﻿
-using DAL.DTO;
-using DAL.Interfaces;
+﻿using DAL.Interfaces;
+using ORM;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Helpers;
 using System.Web.Security;
 
@@ -13,8 +9,8 @@ namespace Blog1.Infrastructure
 {
     public class CustomMembershipProvider : MembershipProvider
     {
-        public IUserRepository UserRepositoryEntity
-          => (IUserRepository)System.Web.Mvc.DependencyResolver.Current.GetService(typeof(IUserRepository));
+        public IRepository<Users> UserRepositoryEntity
+          => (IRepository<Users>)System.Web.Mvc.DependencyResolver.Current.GetService(typeof(IRepository<Users>));
 
         public MembershipUser CreateUser(string name, string email, string password, int role = 2)
         {
@@ -25,7 +21,7 @@ namespace Blog1.Infrastructure
                 return null;
             }
 
-            var user = new DalUser
+            var user = new Users
             {
                 Name = name,
                 Email = email,
@@ -39,7 +35,8 @@ namespace Blog1.Infrastructure
 
         public override bool ValidateUser(string email, string password)
         {
-            var user = UserRepositoryEntity.GetUserByEmail(email);
+            var user = UserRepositoryEntity.Get(filter:_user => _user.Email.Equals(email)).FirstOrDefault();
+            
 
             if (user != null && Crypto.VerifyHashedPassword(user.Password, password))
             {
@@ -50,7 +47,7 @@ namespace Blog1.Infrastructure
 
         public override MembershipUser GetUser(string email, bool userIsOnline)
         {
-            var user = UserRepositoryEntity.GetUserByEmail(email);
+            var user = UserRepositoryEntity.Get(_user => _user.Email.Equals(email)).FirstOrDefault();
 
             if (user == null) return null;
 
