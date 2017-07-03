@@ -3,46 +3,54 @@
 @{
     ViewBag.Title = "Details";
 }
-
-<h2>Details</h2>
-
-<div>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Text)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Text)
-        </dd>
-
-        <dt>
-            <b>Autor</b>
-        </dt>        
-        <dd>
-            @Html.ActionLink(Model.UserName, "Autor", "Posts", new { id = Model.UserName }, null)
-        </dd>
-
-
-        <dt>
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Comments)
-        </dt>
-        <dd>
+<div class="text-center">
+    <h2>Details</h2>
+</div>
+<div class="media">
+    <div class="media-top">
+        <img src="@Url.Action("UserPhotos", "Account" , new { id = Model.UserId})" class="img-rounded" width="30" height="30" />
+        @Html.ActionLink(Model.UserName, "Autor", "Posts", new { id = Model.UserName }, null)
+    </div>
+@if (Model.isPhoto)
+{
+    <div class="media-left">
+        <img src="@Url.Action("Photo", "posts", new { id = Model.Id })" class="img-responsive" />
+    </div>
+}   
+    <div class="media-object">
+        @Html.DisplayFor(model => model.Text)
+        <br />
+        <h5>@Html.DisplayFor(model => model.CreateDate)</h5>
+    </div>
+    <div>
+        <div class="text-center">
+            <h4>@Html.DisplayNameFor(model => model.Comments)</h4>
+        </div>
+        <br />
+        <div id="comments">
             @{Html.RenderAction("List", "Comments");}
-        </dd>
+        </div>
+        <br />
         @if (User.Identity.IsAuthenticated)
         {
-            <dd>
-                @{Html.RenderAction("Create", "Comments");}
-            </dd>
+                <div id="newcomment">
+
+                </div>
+                using (Ajax.BeginForm("Create", "Comments", new { id = Model.Id }, new AjaxOptions { HttpMethod = "Get", UpdateTargetId = "newcomment", Url = Url.Action("Create", "Comments", new { id = Model.Id }) }))
+                {
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-default">Write Comment</button>
+                    </div>
+                }
+
         }
-    </dl>
+    </div>
+    @using (Ajax.BeginForm("Details", "Posts", new { id = Model.Id }, new AjaxOptions { HttpMethod = "Get", UpdateTargetId = "comments", Url = Url.Action("List", "Comments", new { id = Model.Id }) }))
+    {
+        <div class="text-center">
+            <button type="submit" class="btn btn-default">Reload comments</button>
+        </div>
+    } 
 </div>
+
+

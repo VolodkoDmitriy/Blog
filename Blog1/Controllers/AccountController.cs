@@ -5,7 +5,9 @@ using ORM;
 using System;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -39,6 +41,16 @@ namespace Blog1.Controllers
             var iden = HttpContext.User.Identity.GetType();
             return View();
         }
+        [HttpGet]
+        [AllowAnonymous]
+        public PartialViewResult loginPopup()
+        {
+            var type = HttpContext.User.GetType();
+            var iden = HttpContext.User.Identity.GetType();
+            return PartialView("loginPopup");
+        }
+        
+
         [HttpPost]
         [AllowAnonymous]
         public ActionResult Login(LogOnViewModel user)
@@ -131,9 +143,62 @@ namespace Blog1.Controllers
         }
         public PartialViewResult Log()
         {
-            if(User.Identity.IsAuthenticated)
-            ViewBag.userName = User.Identity.Name;
+            if (User.Identity.IsAuthenticated)
+            {
+                ViewBag.userName = User.Identity.Name;
+                ViewBag.profile = "/Account/ProFile/" + service.Get(u => u.Email.Equals(User.Identity.Name)).FirstOrDefault().UserId;
+            }
             return PartialView("_login");
+        }
+
+        [HttpGet]
+        public FileContentResult UserPhotos(int id)
+        {
+            var user = service.Get(id);
+            if (user == null)
+            {
+                user = service.Get(u => u.Email.Equals(HttpUtility.UrlDecode(id.ToString()))).FirstOrDefault();
+            }
+            return File(user.Avatar, "image/png");
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "user")]
+        public ActionResult ProFile(int id)
+        {
+            var user = service.Get(id);
+            UserViewModel userModel = new UserViewModel()
+            {
+                Id = user.UserId,
+                UserName = user.Name
+        };  
+            
+            return View(userModel);
+        }
+        [HttpPost]
+        [Authorize(Roles = "user")]
+        public ActionResult ProFile([Bind(Exclude = "UserFoto")]UserViewModel  e)
+        {
+            if (ModelState.IsValid)
+            {
+                var u = service.Get(e.Id);
+                // To convert the user uploaded Photo as Byte Array before save to DB 
+                byte[] imageData = null;
+                if (Request.Files.Count > 0)
+                {
+                    HttpPostedFileBase poImgFile = Request.Files["UserFoto"];
+
+                    using (var binary = new BinaryReader(poImgFile.InputStream))
+                    {
+                        imageData = binary.ReadBytes(poImgFile.ContentLength);
+                    }
+                    u.Avatar = imageData;
+                }
+                if (User.Identity.Name.Equals(u.Email))
+                    service.Update(u);
+                else return View("NoPermition");
+            }
+            return RedirectToAction("ProFile", new { id = e.Id });
         }
     }
 }

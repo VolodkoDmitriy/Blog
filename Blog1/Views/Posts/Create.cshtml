@@ -1,25 +1,39 @@
 ﻿@model Blog1.Models.PostNewModel
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm("Create", "Posts", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
+        <div class="text-center">
+            <h4>New Post</h4>
+        </div>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
             @Html.LabelFor(model => model.Text, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Text, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Text, new { htmlAttributes = new { @class = "form-control editor" } })
                 @Html.ValidationMessageFor(model => model.Text, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        <div class="form-group  row">
+            <div class="col-md-offset-2 media">
+                <div class="media-top"><span>Image</span></div>
+                <div class="media-bottom"><input type="file" name="Photo" id="Photo" accept=".png,.jpg,.jpeg,.gif,.tif" class="btn btn-default" /> </div>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Add post" class="btn btn-default" />
             </div>
         </div>
+        
+        <script  type="text/javascript">
+            $().ready(function () {
+                $(".editor").jqte();
+            });
+            </script>
     </div>
 }
 

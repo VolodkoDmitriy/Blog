@@ -13,6 +13,7 @@ namespace Blog1.Models
         [DataType(DataType.Text)]
         [Display(Name = "User")]
         public string User { get; set; }
+        public int UserId { get; set; }
 
         [DataType(DataType.MultilineText)]
         [Display(Name = "comments")]

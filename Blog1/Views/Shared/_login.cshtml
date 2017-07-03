@@ -1,11 +1,22 @@
 ﻿
-@if (Request.IsAuthenticated)
-{
-    <b>@ViewBag.userName</b> <span> - </span> @Html.ActionLink("log out", "LogOff", "Account")
-}
-else
-{
-    @Html.ActionLink("Login", "login", "Account");
-    <span> / </span>
-    @Html.ActionLink("Register", "Register", "Account")
-}
+<ul class="nav navbar-nav navbar-right">
+            @if (Request.IsAuthenticated)
+            {
+                <li>
+                    <a href="@ViewBag.profile" class="btn-xs">@ViewBag.userName</a>
+                </li>
+                <li>
+                     @Html.ActionLink("log out", "LogOff", "Account", new { @class = "" })
+                </li>
+            }
+            else
+            {
+
+                <li>
+                    @Ajax.ActionLink("Login", "login", "Account", new AjaxOptions { Url = Url.Action("loginPopup", "Account") }, new { @class = "", data_toggle = "modal", data_target = "#myModal", id = "loginpopup" })
+                </li>
+                <li>                    
+                    @Html.ActionLink("Register", "Register", "Account", new { @class = "" })
+                </li>
+            }
+</ul>

@@ -12,6 +12,7 @@ namespace Blog1.Models
         [DataType(DataType.MultilineText)]
         [Required(ErrorMessage = "The field can not be empty!")]                
         public string Text { get; set; }
-        
+
+        public byte[] Photo { get; set; }
     }
 }

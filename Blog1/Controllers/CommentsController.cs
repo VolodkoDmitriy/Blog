@@ -1,5 +1,6 @@
 ﻿using BLL.Interface;
 using BLL.Services;
+using Blog1.Models;
 using ORM;
 using System.Linq;
 using System.Web;
@@ -28,24 +29,31 @@ namespace Blog1.Controllers
                         {
                             Id = comm.CommentId,
                             Text = HttpUtility.HtmlDecode(comm.commentText),
-                            User = userService.Get(comm.UserId).Email
+                            User = userService.Get(comm.UserId).Email,
+                            UserId = comm.UserId
                         });
 
-            return PartialView(comments);
+            return PartialView("List",comments);
         }
-
-        [HttpGet]
-        public PartialViewResult Create()
+        
+        public PartialViewResult Create(int id)
         {
-            return PartialView();
+            var comm = new NewCommentModel { PostId = id };
+            if (!Request.IsAjaxRequest()) {
+                return PartialView(comm);
+            }
+            else { return PartialView("CreateAjax", comm); }
         }
 
         [HttpPost]
         [Authorize]
-        public ActionResult Create(int id,FormCollection collection)
+        public ActionResult CreateComment(NewCommentModel collection)
         {
-            commentService.Create(id, collection["text"], User.Identity.Name);
-            return RedirectToAction("Details", "Posts", new { id = id });
+            commentService.Create(collection.PostId, collection.Text, User.Identity.Name);
+            if (Request.IsAjaxRequest())
+            { return List(collection.PostId); }
+            else
+            return RedirectToAction("Details", "Posts", new { id = collection.PostId });
         }
 
         [HttpGet]
@@ -54,6 +62,8 @@ namespace Blog1.Controllers
         {            
             var comment = commentService.Get(id);
                 commentService.Delete(id);
+            if (Request.IsAjaxRequest()) { return List(comment.PostId); }
+            else
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
 

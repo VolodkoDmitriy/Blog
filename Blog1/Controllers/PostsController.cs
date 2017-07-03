@@ -111,8 +111,7 @@ namespace Blog1.Controllers
             }
             else return View("SearchNotFound");
         }
-
-        [HttpGet]
+                
         [HandleError(ExceptionType = typeof(NullReferenceException),View = "PostNotFound")]
         public ActionResult Details(int id)
         {
@@ -124,23 +123,31 @@ namespace Blog1.Controllers
                 Id = postentity.PostId,
                 UserId = postentity.UserId,
                 UserName = username,
-                CreateDate = postentity.CreateDate
+                CreateDate = postentity.CreateDate,
+                isPhoto = postentity.Photo != null
             };            
             return View(post);
         }
         [HttpGet]
+        [Authorize(Roles = "user")]
         public ViewResult Create()
         {
             return View();
         }
         [HttpPost]
-        [Authorize(Roles = "user")]
-        public ActionResult Create(PostNewModel e)
+        [ValidateInput(false)]
+        [Authorize(Roles = "user")]        
+        public ActionResult Create([Bind(Exclude = "Photo")]PostNewModel e)
         {
-            var autor = postService.Create(e.Text, User.Identity.Name);
+            if (Request.Files.Count > 0)
+            {
+                postService.Create(e.Text, User.Identity.Name, Request.Files["Photo"]);
+            }
+            else postService.Create(e.Text, User.Identity.Name);
 
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
+
         [HttpGet]
         [PostAutor]
         public ActionResult Delete(int id)
@@ -149,20 +156,36 @@ namespace Blog1.Controllers
             postService.Remove(id);
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
+
         [HttpGet]
-        [PostAutor]
+        [PostAutor]        
         public ActionResult Edit(int id)
         {
             var postEntity = postService.Get(id);
             var postModel = new PostNewModel() { Id = postEntity.PostId, Text = HttpUtility.HtmlDecode(postEntity.Text) };
             return View(postModel);
         }
+
         [HttpPost]
         [PostAutor]
-        public ActionResult Edit(Models.PostNewModel collection)
-        {
-            postService.Edit(collection.Id,collection.Text);
+        [ValidateInput(false)]
+        public ActionResult Edit([Bind(Exclude = "Photo")]PostNewModel collection)
+        {            
+            if (Request.Files.Count > 0)
+            {
+                if(Request.Files["Photo"].ContentLength != 0) { 
+                postService.Edit(collection.Id, collection.Text, Request.Files["Photo"]);
+                }
+                else postService.Edit(collection.Id, collection.Text);
+            }
+            else postService.Edit(collection.Id, collection.Text);
             return RedirectToAction("Details", "Posts", new { id = collection.Id });
+        }
+
+        public FileContentResult Photo(int id)
+        {
+            var post = postService.Get(id);            
+            return File(post.Photo, "image/png");
         }
 
     }

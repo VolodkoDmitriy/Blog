@@ -1,0 +1,45 @@
+﻿@model Blog1.Models.UserViewModel
+
+@{
+    ViewBag.Title = "Profile2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("ProFile", "Account",FormMethod.Post,new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <div class="text-center">
+            <h4>Profile</h4>
+        </div>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group  row">
+            <div class="col-md-offset-2 media">
+                <div class="media-top"><span>Avatar</span></div>
+                <div class="media-body">
+                    <img src="@Url.Action("UserPhotos", "Account" , new { id = Model.Id})" class="img-rounded" width="100" height="100" />
+
+                    @Html.ValidationMessageFor(model => model.UserFoto, "", new { @class = "text-danger" })
+
+                </div>
+                <div class="media-bottom"><input type="file" name="UserFoto" id="UserFoto" accept=".png,.jpg,.jpeg,.gif,.tif" class="btn btn-default" /> </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

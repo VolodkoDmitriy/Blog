@@ -1,25 +1,24 @@
 ﻿@model IEnumerable<Blog1.Models.CommentViewModel>
-
-<table class="table">
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.User)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Text)
-        </td>
-        <td>
-            @if (User.Identity.Name == item.User)
-            {
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) 
-                <span> | </span>
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            }
-            
-        </td>
-    </tr>
-}
-
-</table>
+<div>
+    @foreach (var item in Model)
+    {
+        <div class="media">
+            <div class="media-top">
+                @Html.DisplayFor(modelItem => item.User)
+            </div>
+            <div class="media-left">
+                <img src="@Url.Action("UserPhotos", "Account" , new { id = item.UserId})" class="img-rounded" width="30" height="30" />
+            </div>
+            <div class="media-body">
+                @Html.DisplayFor(modelItem => item.Text)
+            </div>
+            <div class="media-right text-center">
+                @if (User.Identity.Name == item.User)
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-default" })                    
+                    @Ajax.ActionLink("Delete", "Delete", new { id = item.Id }, new AjaxOptions { HttpMethod = "Get", UpdateTargetId = "comments" }, new { @class = "btn btn-default" })
+                }
+            </div>
+        </div>
+    }
+</div>

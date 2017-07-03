@@ -9,7 +9,9 @@ namespace Blog1.Models
     public class PostViewModel
     {
         public int Id { get; set; }
-        [DataType(DataType.MultilineText)]
+        public bool isPhoto { get; set; }
+
+        [DataType(DataType.Html)]
         [Display(Name = "Post")]
         public string Text { get; set; }
         [DataType(DataType.Text)]

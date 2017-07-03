@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using DAL.Interfaces;
 using System.Web;
+using System.IO;
 
 namespace BLL.Services
 {
@@ -16,7 +17,7 @@ namespace BLL.Services
             this.commentsService = commentsService;
             this.userService = userService;
         }
-        public string Create(string text,string email)
+        public string Create(string text,string email, HttpPostedFileBase poImgFile = null)
         {
             var user = userService.Get(u => u.Email.Equals(email))
                                     .FirstOrDefault();
@@ -26,14 +27,33 @@ namespace BLL.Services
                 UserId = user.UserId,
                 CreateDate = DateTime.Now
             };
+            if (poImgFile != null)
+            {
+                byte[] imageData = null;
+                using (var binary = new BinaryReader(poImgFile.InputStream))
+                {
+                    imageData = binary.ReadBytes(poImgFile.ContentLength);
+                }
+                post.Photo = imageData;
+            }
             Create(post);
             return user.Name;
         }
 
-        public void Edit(int id, string text)
+        public void Edit(int id, string text, HttpPostedFileBase poImgFile = null)
         {
-            var post =Get(id);
+            var post = Get(id);
             post.Text = HttpUtility.HtmlEncode(text);
+            if (poImgFile != null)
+            {
+                byte[] imageData = null;
+                using (var binary = new BinaryReader(poImgFile.InputStream))
+                {
+                    imageData = binary.ReadBytes(poImgFile.ContentLength);
+                }
+                post.Photo = imageData;
+            }
+            else post.Photo = null;
             Update(post);
         }
         public void Remove(int id)

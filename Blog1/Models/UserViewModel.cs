@@ -11,5 +11,8 @@ namespace Blog1.Models
         public int Id { get; set; }
         [Display(Name = "User name")]
         public string UserName { get; set; }
+
+        [Display(Name = "Avatar")]
+        public byte[] UserFoto { get; set; }
     }
 }
